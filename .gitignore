@@ -1,0 +1,8 @@
+# Salesforce cache
+.sfdx/
+
+# MacOS system files
+.DS_Store
+
+# VS Code project settings
+.vscode/

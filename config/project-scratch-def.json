@@ -1,0 +1,12 @@
+{
+  "orgName": "CopadoTask2",
+  "country": "US",
+  "edition": "Developer",
+  "language": "en_US",
+  "hasSampleData": true,
+  "settings": {
+    "lightningExperienceSettings": {
+      "enableS1DesktopEnabled": true
+    }
+  }
+}
