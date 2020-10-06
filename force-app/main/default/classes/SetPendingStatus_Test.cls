@@ -4,9 +4,10 @@ private class SetPendingStatus_Test {
     private static void execute() {
         
         // Setup
-        SyncWithOtherOrg.skipSyncing = true;
+        fflib_SObjectDomain.getTriggerEvent(Contacts.class).disableAfterInsert();
+        fflib_SObjectDomain.getTriggerEvent(Contacts.class).disableAfterUpdate();
         Contact c = (Contact) new Contact_t().persist();
-        
+
         
         // Exercise
         c.LastName = 'Changed';

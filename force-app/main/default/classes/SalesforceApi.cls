@@ -13,7 +13,7 @@ public inherited sharing class SalesforceApi extends ffhttp_Client.AbstractClien
 
     // PUBLIC
 
-    public List<Response> sendToOrg1(List<Contact> contacts) {
+    public List<Response> sendToOtherOrg(List<Contact> contacts) {
         return (List<Response>) new HttpClientRequest(this,
                                 upsertEndpoint(),
                                 ffhttp_Client.REQUEST_METHOD_POST, new Request(contacts),

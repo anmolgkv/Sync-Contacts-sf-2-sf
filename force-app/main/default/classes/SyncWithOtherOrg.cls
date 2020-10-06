@@ -3,29 +3,21 @@ public inherited sharing class SyncWithOtherOrg {
     @TestVisible
 	private static final String CALLOUT_FAIL_MESSAGE = 'Callout Failed';
     
-    @TestVisible
-    private static Boolean skipSyncing = false;
-
     private Set<Id> contactIds;
-    private static Set<String> relevantFields = relevantFields();
+
 
     // CONSTRUCTOR
 
     public SyncWithOtherOrg(List<Contact> contacts) {
-        this(contacts, null);
-    }
-
-    
-    public SyncWithOtherOrg(List<Contact> contacts, Map<Id, Contact> oldContacts) {
-        this.contactIds = filterRelevantRecords(contacts, oldContacts);
+        contactIds = new Map<Id, Contact>(contacts).keySet();
     }
     
 
     // PUBLIC
 
     public void execute() {
-        if(!contactIds.isEmpty() && !skipSyncing) {
-            sync(contactIds);
+        if(!contactIds.isEmpty()) {
+            sendToOtherOrg(contactIds);
         }
     }
 
@@ -33,7 +25,7 @@ public inherited sharing class SyncWithOtherOrg {
     // PRIVATE
     
     @future(callout=true)
-    private static void sync(Set<Id> contactIds) {
+    private static void sendToOtherOrg(Set<Id> contactIds) {
         List<Contact> externalContacts = new List<Contact>();
         
         for(Contact contact : new ContactsSelector().byIds(contactIds)) {
@@ -43,7 +35,7 @@ public inherited sharing class SyncWithOtherOrg {
         }
         
         try {
-            List<SalesforceApi.Response> responses = new SalesforceApi().sendToOrg1(externalContacts); 
+            List<SalesforceApi.Response> responses = new SalesforceApi().sendToOtherOrg(externalContacts); 
             persistSyncState(externalContacts, responses);           
         }
         catch(CalloutException ex) {
@@ -64,45 +56,5 @@ public inherited sharing class SyncWithOtherOrg {
         fflib_SObjectDomain.getTriggerEvent(Contacts.class).disableAll();
 
         DMLManager.updateAsUser(contacts);
-    }
-
-
-    private Set<Id> filterRelevantRecords(List<Contact> contacts, Map<Id, Contact> oldContacts) {
-        Set<Id> result = new Set<Id>();
-
-        for(Contact contact : contacts) {
-            Contact oldContact = oldContacts != null ? oldContacts.get(contact.Id) : null;
-
-            if(oldContact == null || isChanged(contact, oldContact)) {
-                result.add(contact.Id);
-            }
-        }
-
-        return result;
-    }
-
-
-    public static Boolean isChanged(Contact contact, Contact oldContact) {
-        Boolean result = false;
-
-        for(String field : relevantFields) {
-            if(contact.get(field) != oldContact.get(field)) {
-                result = true;
-                break;
-            }
-        }
-
-        return result;
-    }
-
-
-    private static Set<String> relevantFields() {
-        Set<String> result = new Set<String>();
-
-        for(Schema.FieldSetMember field : SObjectType.Contact.FieldSets.RelevantFields.getFields()) {
-            result.add(field.getFieldPath());
-        }
-
-        return result;
     }
 }

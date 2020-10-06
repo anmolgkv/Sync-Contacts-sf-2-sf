@@ -10,34 +10,78 @@ public with sharing class Contacts extends fflib_SObjectDomain {
     // PUBLIC
 
     public override void onBeforeInsert() {
-        new SetPendingStatus(cast(records)).execute();
+        new SetPendingStatus(records).execute();
     }
 
 
     public override void onBeforeUpdate(Map<Id, SObject> old) {
-        new SetPendingStatus(cast(records), cast(old)).execute();
+        List<Contact> changedContacts = changed( cast(old) );
+
+        new SetPendingStatus(changedContacts).execute();
     }
 
 
     public override void onAfterInsert() {
-        new SyncWithOtherOrg(cast(records)).execute();
+        new SyncWithOtherOrg(records).execute();
     }
 
 
     public override void onAfterUpdate(Map<Id, SObject> old) {
-        new SyncWithOtherOrg(cast(records), cast(old)).execute();
+        List<Contact> changedContacts = changed( cast(old) );
+
+        new SyncWithOtherOrg(changedContacts).execute();
     }
 
 
     // PRIVATE
 
-    private List<Contact> cast(List<SObject> records) {
-        return (List<Contact>) records;
+    private List<Contact> changed(Map<Id, Contact> oldContacts) {
+        List<Contact> result = new List<Contact>();
+
+        for(Contact contact : cast(records)) {
+            Contact oldContact = oldContacts.get(contact.Id);
+
+            if(isChanged(contact, oldContact)) {
+                result.add(contact);
+            }
+        }
+
+        return result;
+    }   
+
+
+    public static Boolean isChanged(Contact contact, Contact oldContact) {
+        Boolean result = false;
+
+        for(String field : relevantFields()) {
+            if(contact.get(field) != oldContact.get(field)) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
     }
 
 
-    private Map<Id, Contact> cast(Map<Id, SObject> records) {
-        return (Map<Id, Contact>) records;
+    private static Set<String> relevantFields() {
+        Set<String> result = new Set<String>();
+
+        for(Schema.FieldSetMember field : SObjectType.Contact.FieldSets.RelevantFields.getFields()) {
+            result.add(field.getFieldPath());
+        }
+
+        return result;
+    }
+
+
+    private List<Contact> cast(List<SObject> uncasted) {
+        return (List<Contact>) uncasted;
+    }
+
+
+    private Map<Id, Contact> cast(Map<Id, SObject> uncasted) {
+        return (Map<Id, Contact>) uncasted;
     }
 
 
