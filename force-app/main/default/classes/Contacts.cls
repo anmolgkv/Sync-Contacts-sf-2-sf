@@ -50,7 +50,7 @@ public with sharing class Contacts extends fflib_SObjectDomain {
     }   
 
 
-    public static Boolean isChanged(Contact contact, Contact oldContact) {
+    private static Boolean isChanged(Contact contact, Contact oldContact) {
         Boolean result = false;
 
         for(String field : relevantFields()) {
