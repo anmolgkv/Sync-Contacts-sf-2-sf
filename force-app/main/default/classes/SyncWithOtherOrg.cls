@@ -1,8 +1,5 @@
 public inherited sharing class SyncWithOtherOrg {
     
-    @TestVisible
-	private static final String CALLOUT_FAIL_MESSAGE = 'Callout Failed';
-    
     private Set<Id> contactIds;
 
 
@@ -48,7 +45,7 @@ public inherited sharing class SyncWithOtherOrg {
 
         for(Integer i = 0; i < contacts.size(); i++) {
             contacts[i].Id = contacts[i].ExternalId__c;
-            contacts[i].SyncMessage__c = responses != null ? responses[i].message() : CALLOUT_FAIL_MESSAGE;
+            contacts[i].SyncMessage__c = responses != null ? responses[i].message() : Label.CalloutError;
             contacts[i].ExternalId__c = responses != null ? responses[i].id : null;
         }
         

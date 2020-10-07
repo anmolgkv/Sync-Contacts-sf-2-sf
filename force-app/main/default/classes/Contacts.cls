@@ -15,7 +15,7 @@ public with sharing class Contacts extends fflib_SObjectDomain {
 
 
     public override void onBeforeUpdate(Map<Id, SObject> old) {
-        List<Contact> changedContacts = changed( cast(old) );
+        List<Contact> changedContacts = filterChanged( cast(old) );
 
         new SetPendingStatus(changedContacts).execute();
     }
@@ -27,7 +27,7 @@ public with sharing class Contacts extends fflib_SObjectDomain {
 
 
     public override void onAfterUpdate(Map<Id, SObject> old) {
-        List<Contact> changedContacts = changed( cast(old) );
+        List<Contact> changedContacts = filterChanged( cast(old) );
 
         new SyncWithOtherOrg(changedContacts).execute();
     }
@@ -35,7 +35,7 @@ public with sharing class Contacts extends fflib_SObjectDomain {
 
     // PRIVATE
 
-    private List<Contact> changed(Map<Id, Contact> oldContacts) {
+    private List<Contact> filterChanged(Map<Id, Contact> oldContacts) {
         List<Contact> result = new List<Contact>();
 
         for(Contact contact : cast(records)) {

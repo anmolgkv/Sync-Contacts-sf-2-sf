@@ -18,7 +18,7 @@ private class SyncWithOtherOrg_Test {
 
         // Verify
         Contact contact = [Select SyncMessage__c From Contact];
-        System.assertEquals(SyncWithOtherOrg.CALLOUT_FAIL_MESSAGE, contact.SyncMessage__c);
+        System.assertEquals(Label.CalloutError, contact.SyncMessage__c);
     }
     
     
